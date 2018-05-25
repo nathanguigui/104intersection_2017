@@ -1,0 +1,108 @@
+#!/usr/bin/env php
+<?php
+
+function print_warg() 
+{
+	$arg_list = func_get_args();
+	echo "Bad argument:\n expected: 9, got: " . $arg_list[0] . "\n";
+	exit(84);
+}
+
+function print_solution_count($delta, $a)
+{
+	if ($delta < 0)
+		echo "No intersection point.\n";
+	elseif ($delta > 0)
+		echo "2 intersection points :\n";
+	else {
+		if ($a != 0)
+			echo "1 intersection point :\n";
+		else {
+			echo "There is an infinite number of intersection points.\n";
+			exit(0);
+		}
+
+	}
+}
+
+function print_solution($delta, $a, $b, $xp, $xv, $yp, $yv, $zp, $zv)
+{
+	$lambda1;
+	$lambda2;
+
+	if ($delta > 0) {
+		$lambda1 = (-$b + sqrt($delta)) / (2 * $a);
+		$lambda2 = (-$b - sqrt($delta)) / (2 * $a);
+		$x1 = number_format(round($xp + ($lambda1 * $xv), 3), 3);
+		$y1 = number_format(round($yp + ($lambda1 * $yv), 3), 3);
+		$z1 = number_format(round($zp + ($lambda1 * $zv), 3), 3);
+		$x2 = number_format(round($xp + ($lambda2 * $xv), 3), 3);
+		$y2 = number_format(round($yp + ($lambda2 * $yv), 3), 3);
+		$z2 = number_format(round($zp + ($lambda2 * $zv), 3), 3);
+		echo "(" .$x1.", ".$y1.", ".$z1.")\n";
+		echo "(" .$x2.", ".$y2.", ".$z2.")\n";
+	}elseif ($delta == 0) {
+		$lambda1 = -$b / (2 * $a);
+		$x1 = number_format(round($xp + ($lambda1 * $xv), 3), 3);
+		$y1 = number_format(round($yp + ($lambda1 * $yv), 3), 3);
+		$z1 = number_format(round($zp + ($lambda1 * $zv), 3), 3);
+		echo "(" .$x1.", ".$y1.", ".$z1.")\n";
+	}
+	exit(0);
+}
+
+function print_solve($opt, $xp, $yp, $zp, $xv, $yv, $zv, $p)
+{
+	switch ($opt) {
+		case 1:		//sphere
+			$a = pow($xv, 2) + pow($yv, 2) + pow($zv, 2);
+			$b = (2 * $xp * $xv) + (2 * $yp * $yv) + (2 * $zp * $zv);
+			$c = pow($xp, 2) + pow($yp, 2) + pow($zp, 2) - pow($p, 2);
+			break;
+		case 2:		//cylindre
+			$a = pow($xv, 2) + pow($yv, 2);
+			$b = 2 * ($xp * $xv + $yp * $yv);
+			$c = pow($xp, 2) + pow($yp, 2) - pow($p, 2);
+			break;
+		case 3:		//cone
+			$a = pow($xv, 2) + pow($yv, 2) - (pow($zv, 2) / pow(tan($p), 2));
+			$b = (2 * $xp * $xv) + (2 * $yp * $yv) - (2 * $zp * $zv) / pow(tan($p), 2);
+			$c = pow($xp, 2) + pow($yp, 2) - (pow($zp, 2) / pow(tan($p), 2));
+			break;
+	}
+	$delta = ($b * $b) - 4* $a * $c;
+	print_solution_count($delta, $a);
+	print_solution($delta, $a, $b, $xp, $xv, $yp, $yv, $zp, $zv);
+}
+
+function print_case($opt, $p)
+{
+	switch ($opt) {
+		case 1:
+			echo "sphere of radius " . $p . "\n";
+			break;
+		case 2:
+			echo "cylinder of radius " . $p . "\n";
+			break;
+		case 3:
+			echo "cone of " . $p . " degree angle\n";
+			break;
+		
+		default:
+			exit(84);
+			break;
+	}
+}
+
+function print_light($xp, $yp, $zp, $xv, $yv, $zv)
+{
+	echo "straight line going through the (" . $xp . "," . $yp . "," . $zp . ") point and of direction vector (" . $xv . "," . $yv . "," . $zv . ")\n";
+}
+
+if ($argc != 9)
+	print_warg($argc);
+print_case($argv[1], $argv[8]);
+print_light($argv[2], $argv[3], $argv[4], $argv[5], $argv[6], $argv[7]);
+print_solve($argv[1], $argv[2], $argv[3], $argv[4], $argv[5], $argv[6], $argv[7], $argv[8]);
+
+?>
